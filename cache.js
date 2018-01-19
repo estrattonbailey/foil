@@ -2,13 +2,13 @@ import assert from 'nanoassert'
 
 const _cache = {}
 
-function handler (path, fn, cache) {
+function mechanism (path, fn, cache) {
   if (cache[path]) return cache[path]
   cache[path] = fn
   return cache[path]
 }
 
-export default function createCache (handler = handler) {
+export default function createCache (handler = mechanism) {
   assert(typeof handler === 'function', `cache handler should be a function`)
 
   return {

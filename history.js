@@ -8,6 +8,7 @@ export default function createHistory () {
     },
     update (fn) {
       handlers.push(fn)
+      return () => handlers.slice(handlers.indexOf(fn), 1)
     }
   }
 }

@@ -17,7 +17,7 @@
     "watch:cache": "microbundle watch -i cache.js -o dist/cache.js",
     "watch:index": "microbundle watch",
     "build": "npm run build:history && npm run build:cache && npm run build:index",
-    "watch": "npm run watch:history && npm run watch:cache && npm run watch:index",
+    "watch": "concurrently 'npm run watch:history' 'npm run watch:cache' 'npm run watch:index'",
     "publish": "npm publish"
   },
   "repository": {
@@ -37,6 +37,7 @@
   },
   "homepage": "https://github.com/estrattonbailey/scouter#readme",
   "devDependencies": {
+    "concurrently": "^3.5.1",
     "microbundle": "^0.2.4"
   },
   "dependencies": {

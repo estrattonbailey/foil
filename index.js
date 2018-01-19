@@ -1,13 +1,5 @@
 import assert from 'nanoassert'
 
-function argsToArr (args) {
-  let a = []
-  for (let i = args.length; i > 0; i--) {
-    a.push(args[i])
-  }
-  return a
-}
-
 function getParts (url) {
   const parts = url.split('/')
   return parts.slice(parts[0] !== '' ? 0 : 1)
@@ -47,9 +39,7 @@ export function route (r) {
   assert(typeof r.path === 'string', 'route.path should be a string')
   assert(typeof r.component === 'function', 'route.component should be a function')
 
-  return function child () {
-    const rs = argsToArr(arguments)
-
+  return function child (...rs) {
     r.routes = rs && rs.length > 0 ? (
       (function walk (routes) {
         return routes.map(route => {
@@ -70,8 +60,8 @@ export function route (r) {
   }
 }
 
-export function router () {
-  const routes = []
+export function router (...defs) {
+  const routes = [];
 
   (function walk (rs) {
     while (rs.length) {
@@ -83,7 +73,7 @@ export function router () {
       })
       walk(route.routes)
     }
-  })(argsToArr(arguments))
+  })(defs)
 
   return {
     resolve (pathname, context) {
