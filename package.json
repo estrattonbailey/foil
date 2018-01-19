@@ -1,6 +1,6 @@
 {
   "name": "scouter",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "1kb framework agnostic router.",
   "source": "index.js",
   "module": "scouter.es.js",
