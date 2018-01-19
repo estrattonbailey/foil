@@ -25,10 +25,8 @@
     "url": "git+ssh://git@github.com/estrattonbailey/scouter.git"
   },
   "keywords": [
-    "application",
-    "framework",
-    "jxs",
-    "routing"
+    "routing",
+    "router"
   ],
   "author": "estrattonbailey",
   "license": "MIT",
