@@ -1,2 +1,0 @@
-!function(e,n){"object"==typeof exports&&"undefined"!=typeof module?module.exports=n(require("nanoassert")):"function"==typeof define&&define.amd?define(["nanoassert"],n):e.scouter=n(e.assert)}(this,function(e){e=e&&e.hasOwnProperty("default")?e.default:e;var n={};function t(e,n,t){return t[e]?t[e]:(t[e]=n,t[e])}return function(o){return void 0===o&&(o=t),e("function"==typeof o,"cache handler should be a function"),{load:function(e,t){return o(e,t,n)}}}});
-//# sourceMappingURL=index.umd.js.map

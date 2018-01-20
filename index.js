@@ -82,15 +82,12 @@ export function router (...defs) {
           const ctx = Object.assign(context || {}, { params })
 
           if (typeof loader === 'function') {
-            const data = this.cache ? (
-              this.cache.load(pathname, Promise.resolve(loader(null, ctx)))
-            ) : Promise.resolve(loader(null, ctx))
-
-            return data.then(data => ({
-              component,
-              data,
-              params
-            }))
+            return Promise.resolve(loader(null, ctx))
+              .then(data => ({
+                component,
+                data,
+                params
+              }))
           } else {
             return {
               component,

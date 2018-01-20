@@ -1,24 +1,14 @@
 {
   "name": "scouter",
   "version": "0.0.5",
-  "description": "1kb framework agnostic router.",
+  "description": "700 byte framework agnostic router.",
   "source": "index.js",
-  "module": "scouter.es.js",
-  "main": "scouter.js",
-  "umd:main": "scouter.umd.js",
-  "files": [
-    "cache",
-    "history"
-  ],
+  "module": "dist/scouter.es.js",
+  "main": "dist/scouter.js",
+  "umd:main": "dist/scouter.umd.js",
   "scripts": {
-    "build:history": "microbundle build -i history.js -o history/index.js",
-    "build:cache": "microbundle build -i cache.js -o cache/index.js",
-    "build:index": "microbundle build",
-    "watch:history": "microbundle watch -i history.js -o history/index.js",
-    "watch:cache": "microbundle watch -i cache.js -o cache/index.js",
-    "watch:index": "microbundle watch",
-    "build": "npm run build:history && npm run build:cache && npm run build:index",
-    "watch": "concurrently 'npm run watch:history' 'npm run watch:cache' 'npm run watch:index'",
+    "build": "microbundle build",
+    "watch": "microbundle watch",
     "publish": "npm publish"
   },
   "repository": {

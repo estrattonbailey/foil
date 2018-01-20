@@ -1,2 +1,0 @@
-!function(n,e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define(e):n.scouter=e()}(this,function(){return function(){window.location.pathname;var n=[];return{push:function(e){history.pushState({},"",e);for(var t=0,o=n;t<o.length;t+=1)(0,o[t])(e)},update:function(e){return n.push(e),function(){return n.slice(n.indexOf(e),1)}}}}});
-//# sourceMappingURL=index.umd.js.map
