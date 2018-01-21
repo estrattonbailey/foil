@@ -7,9 +7,9 @@ import Posts from './routes/Posts.js'
 import Post from './routes/Post.js'
 
 export default router(
-  Home(),
-  About(),
+  Home,
+  About,
   Posts(
-    Post()
+    Post
   )
 )

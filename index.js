@@ -40,40 +40,32 @@ export function route (r) {
   assert(typeof r.component === 'function', 'route.component should be a function')
 
   return function child (...rs) {
-    r.routes = rs && rs.length > 0 ? (
-      (function walk (routes) {
-        return routes.map(route => {
-          route.path = joinRoute(r.path, route.path)
-          if (route.loader && r.loader) {
-            const loader = route.loader
-            route.loader = (props, ctx) => {
-              return Promise.resolve(r.loader(props, ctx)).then(props => loader(props, ctx))
-            }
-          }
-          walk(r.routes || [])
-          return route
-        })
-      })(rs)
-    ) : []
-
+    r.routes = rs || []
     return r
   }
 }
 
 export function router (...defs) {
-  const routes = [];
+  const routes = []; // need semi
 
-  (function walk (rs) {
+  (function walk (rs, parent) {
     while (rs.length) {
-      const route = rs.pop()
-      routes.push({
-        parts: getParts(route.path),
-        component: route.component,
-        loader: route.loader
-      })
-      walk(route.routes)
+      const def = rs.shift()
+      const route = typeof def === 'function' ? def() : def
+      route.path = joinRoute(parent.path, route.path)
+      route.parts = getParts(route.path)
+      if (parent.loader) {
+        const loader = route.loader
+        route.loader = (props, ctx) => {
+          return Promise.resolve(parent.loader(props, ctx)).then(props => loader ? loader(props, ctx) : props)
+        }
+      }
+      routes.push(route)
+      walk(route.routes, route)
     }
-  })(defs)
+  })(defs, { path: '' })
+
+  console.log(routes)
 
   return {
     resolve (pathname, context) {
