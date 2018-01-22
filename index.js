@@ -45,13 +45,28 @@ export function route (r) {
   }
 }
 
+export function use (fn) {
+  assert(typeof fn === 'function', 'middleware should be a function')
+
+  return function middleware (props, ctx) {
+    return fn(props, ctx)
+  }
+}
+
 export function router (...defs) {
   const routes = []; // need semi
 
-  (function walk (rs, parent) {
+  (function walk (rs, parent, middleware) {
     while (rs.length) {
       const def = rs.shift()
+
+      if (def.name === 'middleware') {
+        middleware.push(def)
+        continue
+      }
+
       const route = typeof def === 'function' ? def() : def
+      route.middleware = middleware
       route.path = joinRoute(parent.path, route.path)
       route.parts = getParts(route.path)
       if (parent.loader) {
@@ -60,27 +75,31 @@ export function router (...defs) {
           return Promise.resolve(parent.loader(props, ctx)).then(props => loader ? loader(props, ctx) : props)
         }
       }
-      routes.push(route)
-      walk(route.routes, route)
-    }
-  })(defs, { path: '' })
 
-  console.log(routes)
+      routes.push(route)
+
+      walk(route.routes, route, middleware.slice(0, middleware.length)) // clone array
+    }
+  })(defs, { path: '' }, [])
 
   return {
-    resolve (pathname, context) {
-      return Promise.resolve(getRoute(pathname, routes))
-        .then(({ component, loader, params }) => {
-          const ctx = Object.assign(context || {}, { params })
+    resolve (location, context) {
+      return Promise.resolve(getRoute(location, routes))
+        .then(({ component, loader, params, middleware, path }) => {
+          const ctx = Object.assign(context || {}, { params, location })
 
           if (typeof loader === 'function') {
-            return Promise.resolve(loader(null, ctx))
-              .then(data => ({
-                component,
-                data,
-                params
-              }))
+            return Promise.resolve(loader({}, ctx))
+              .then(data => {
+                for (let fn of middleware) fn(data, ctx)
+                return {
+                  component,
+                  data,
+                  params
+                }
+              })
           } else {
+            for (let fn of middleware) fn({}, ctx)
             return {
               component,
               data: {},
