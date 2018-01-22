@@ -176,7 +176,7 @@ const AboutMember = route({
 
 const app = router (
   About(
-    AboutMember()
+    AboutMember
   )
 )
 
@@ -222,7 +222,7 @@ const About = route({
 ## Server Side Rendering
 ```javascript
 const app = require('express')()
-const { renderToString } from 'react-dom/server'
+const { renderToString } = require('react-dom/server')
 
 app.get('*', (req, res) => {
   router.resolve(req.originalUrl).then(({ component: Comp }) => {
