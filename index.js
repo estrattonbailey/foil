@@ -41,6 +41,7 @@ export function route (r) {
 
   return function child (...rs) {
     r.routes = rs || []
+    r.options = r.options || {}
     return r
   }
 }
@@ -69,10 +70,10 @@ export function router (...defs) {
       route.middleware = middleware
       route.path = joinRoute(parent.path, route.path)
       route.parts = getParts(route.path)
-      if (parent.loader) {
-        const loader = route.loader
-        route.loader = (props, ctx) => {
-          return Promise.resolve(parent.loader(props, ctx)).then(props => loader ? loader(props, ctx) : props)
+      if (parent.load) {
+        const load = route.load
+        route.load = (props, ctx) => {
+          return Promise.resolve(parent.load(props, ctx)).then(props => load ? load(props, ctx) : props)
         }
       }
 
@@ -85,25 +86,27 @@ export function router (...defs) {
   return {
     resolve (location, context) {
       return Promise.resolve(getRoute(location, routes))
-        .then(({ component, loader, params, middleware, path }) => {
+        .then(({ component, load, params, middleware, path, options }) => {
           const ctx = Object.assign(context || {}, { params, location })
 
-          if (typeof loader === 'function') {
-            return Promise.resolve(loader({}, ctx))
+          for (let fn of middleware) fn(ctx)
+
+          if (typeof load === 'function') {
+            return Promise.resolve(load({}, ctx))
               .then(data => {
-                for (let fn of middleware) fn(data, ctx)
                 return {
+                  data: data || {},
                   component,
-                  data,
-                  params
+                  params,
+                  options
                 }
               })
           } else {
-            for (let fn of middleware) fn({}, ctx)
             return {
-              component,
               data: {},
-              params
+              component,
+              params,
+              options
             }
           }
         })

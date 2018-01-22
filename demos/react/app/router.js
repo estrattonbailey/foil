@@ -7,8 +7,12 @@ import Posts from './routes/Posts.js'
 import Post from './routes/Post.js'
 
 export default router(
-  use((props, ctx) => {
-    console.log('top', props, ctx)
+  use(ctx => {
+    if (/about/.test(ctx.location)) {
+      console.log('redirect')
+      ctx.location = '/'
+    }
+    return ctx
   }),
   Home,
   About,
