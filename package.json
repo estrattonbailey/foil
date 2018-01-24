@@ -1,6 +1,6 @@
 {
   "name": "scouter",
-  "version": "0.0.9",
+  "version": "0.0.8",
   "description": "700 byte framework agnostic router.",
   "source": "index.js",
   "module": "dist/scouter.es.js",
@@ -26,8 +26,6 @@
   },
   "homepage": "https://github.com/estrattonbailey/scouter#readme",
   "devDependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "concurrently": "^3.5.1",
     "microbundle": "^0.2.4"
   },
   "dependencies": {
