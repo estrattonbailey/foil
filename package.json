@@ -1,11 +1,11 @@
 {
-  "name": "scouter",
-  "version": "0.0.8",
-  "description": "700 byte framework agnostic router.",
+  "name": "foil",
+  "version": "0.1.0",
+  "description": "800 byte framework agnostic router.",
   "source": "index.js",
-  "module": "dist/scouter.es.js",
-  "main": "dist/scouter.js",
-  "umd:main": "dist/scouter.umd.js",
+  "module": "dist/foil.es.js",
+  "main": "dist/foil.js",
+  "umd:main": "dist/foil.umd.js",
   "scripts": {
     "build": "microbundle build",
     "watch": "microbundle watch",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/estrattonbailey/scouter.git"
+    "url": "git+ssh://git@github.com/estrattonbailey/foil.git"
   },
   "keywords": [
     "routing",
@@ -22,9 +22,9 @@
   "author": "estrattonbailey",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/estrattonbailey/scouter/issues"
+    "url": "https://github.com/estrattonbailey/foil/issues"
   },
-  "homepage": "https://github.com/estrattonbailey/scouter#readme",
+  "homepage": "https://github.com/estrattonbailey/foil#readme",
   "devDependencies": {
     "microbundle": "^0.2.4"
   },

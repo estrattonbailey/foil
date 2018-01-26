@@ -1,8 +1,8 @@
-# scouter
+# foil
 800 byte framework agnostic universal router.
 
 ## Features
-`scouter` is an attempt to take the magic out of routing front-end applications. Specifically, React. It's Not Components™, and hopefully that's a good thing.
+`foil` is an attempt to take the magic out of routing front-end applications. Specifically, React. It's Not Components™, and hopefully that's a good thing.
 
 1. Data first
 2. Async-by-default
@@ -10,11 +10,11 @@
 4. Middleware
 5. Universal, works in Node
 
-`scouter` can be used with most UI building libraries, but the examples below will use React.
+`foil` can be used with most UI building libraries, but the examples below will use React.
 
 ## Install
 ```bash
-npm i scouter --save
+npm i foil --save
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ npm i scouter --save
 ```javascript
 import React from 'react'
 import { render } from 'react-dom'
-import { router, route, use } from 'scouter'
+import { router, route, use } from 'foil'
 
 const app = router(
   use(context => {
@@ -54,7 +54,7 @@ Routes accept an object as their only parameter. The route object can contain th
   - not used internally (at the moment), but can be useful to library users
 
 ```javascript
-import { route } from 'scouter'
+import { route } from 'foil'
 
 const path = '/'
 
@@ -76,11 +76,11 @@ export default route({ path, component, load, options })
 ```
 
 ## Asynchronous routes
-When a `load` handler is defined on a route, `scouter` will wait to resolve the route until the routes's `load` function resolves. During this time, the developer can show a loading animation or what-have-you.
+When a `load` handler is defined on a route, `foil` will wait to resolve the route until the routes's `load` function resolves. During this time, the developer can show a loading animation or what-have-you.
 
 Named route parameters are passed to the `load` function on the `context` object.
 ```javascript
-import { route } from 'scouter'
+import { route } from 'foil'
 
 const path = '/posts/:slug'
 
@@ -100,7 +100,7 @@ Routes can be nested by passing a route to the function returned from the parent
 
 This means that certain generic routes can be reused in different locations. The code below results in four separate routes: `/about`, `/about/:slug`, `/posts`, and `/posts/:slug`.
 ```javascript
-import { router, route } from 'scouter'
+import { router, route } from 'foil'
 
 const About = route({
   path: '/about',
@@ -130,7 +130,7 @@ export default router(
 ## Nested loading
 Nested routes will wait for their parent's `load` functions to resolve *before calling their own*. This is useful for cases where child routes depend on data from their parents.
 ```javascript
-import { router, route } from 'scouter'
+import { router, route } from 'foil'
 import store from './my-store.js'
 
 const About = route({
@@ -186,7 +186,7 @@ app.resolve('/about/person-two').then(({ component: Comp, data, params }) => {
 ```
 
 ## Middleware
-`scouter` implements very simple middleware. Middleware are applied for the route scope in which they are defined, and all nested scopes.
+`foil` implements very simple middleware. Middleware are applied for the route scope in which they are defined, and all nested scopes.
 
 Below, `middleware1` will be called when the `/` route resolves. When the `/posts/:slug` route resolves, both `middleware1` and `middleware2` will be called.
 ```javascript
@@ -246,5 +246,8 @@ app.listen(8080)
 1. `document.title` using `options.title` utility
 2. Incremental rendering using `picostate`
 3. Redirect example
+
+* * *
+Many thanks to [jkuri](https://github.com/jkuri) for the name!
 
 MIT
