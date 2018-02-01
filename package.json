@@ -1,11 +1,14 @@
 {
   "name": "foil",
   "version": "0.1.1",
-  "description": "800 byte framework agnostic router.",
+  "description": "700 byte framework agnostic router.",
   "source": "index.js",
   "module": "dist/foil.es.js",
   "main": "dist/foil.js",
   "umd:main": "dist/foil.umd.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "microbundle build",
     "watch": "microbundle watch",
@@ -26,9 +29,7 @@
   },
   "homepage": "https://github.com/estrattonbailey/foil#readme",
   "devDependencies": {
-    "microbundle": "^0.2.4"
+    "microbundle": "^0.4.3"
   },
-  "dependencies": {
-    "nanoassert": "^1.1.0"
-  }
+  "dependencies": {}
 }

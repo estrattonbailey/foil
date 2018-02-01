@@ -1,5 +1,3 @@
-import assert from 'nanoassert'
-
 function getParts (url) {
   const parts = url.split('/')
   return parts.slice(parts[0] !== '' ? 0 : 1)
@@ -35,10 +33,6 @@ function joinRoute (a, b) {
 }
 
 export function route (r) {
-  assert(r.path && r.component, 'routes require both path and component properties')
-  assert(typeof r.path === 'string', 'route.path should be a string')
-  assert(typeof r.component === 'function', 'route.component should be a function')
-
   return function child (...rs) {
     r.routes = rs || []
     r.options = r.options || {}
@@ -47,8 +41,6 @@ export function route (r) {
 }
 
 export function use (fn) {
-  assert(typeof fn === 'function', 'middleware should be a function')
-
   return function middleware (props, ctx) {
     return fn(props, ctx)
   }
@@ -100,6 +92,8 @@ export function router (...defs) {
                   params,
                   options
                 }
+              }).catch(e => {
+                console.error(`foil: route loader threw an error`, e)
               })
           } else {
             return {

@@ -1,5 +1,5 @@
 # foil
-800 byte framework agnostic universal router.
+700 byte framework agnostic universal router.
 
 ## Features
 `foil` is an attempt to take the magic out of routing front-end applications. Specifically, React. It's Not Components™, and hopefully that's a good thing.
