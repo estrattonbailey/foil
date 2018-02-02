@@ -68,8 +68,8 @@ export function router (...defs) {
 
       if (parent.load) {
         const load = route.load
-        route.load = (props, ctx) => {
-          return Promise.resolve(parent.load(props, ctx)).then(props => load ? load(props, ctx) : props)
+        route.load = (ctx, props) => {
+          return Promise.resolve(parent.load(ctx, props)).then(props => load ? load(ctx, props) : props)
         }
       }
 
@@ -79,47 +79,36 @@ export function router (...defs) {
     }
   })(defs, { path: '' }, [])
 
-  function resolve (location, context) {
-    return Promise.resolve(getRoute(location, routes))
-      .then(({ component, load, params, middleware, path, options }) => {
-        const name = component.displayName || component.name
-        let redirect = false
-        const ctx = Object.assign(context || {}, {
-          params,
-          location,
-          redirect (location) {
-            redirect = location
-          }
-        })
+  function go (location, redirect = {}) {
+    const { path, params, middleware, payload } = getRoute(location, routes)
 
-        for (let fn of middleware) fn(ctx)
+    let to = null
 
-        if (redirect) return resolve(redirect, ctx)
+    const context = {
+      params,
+      location,
+      redirect (loc) {
+        to = loc
+      }
+    }
 
-        if (typeof load === 'function') {
-          return Promise.resolve(load({}, ctx))
-            .then(data => {
-              return {
-                data: data || {},
-                component,
-                params,
-                options
-              }
-            }).catch(e => {
-              console.error(`foil: route loader for ${name} threw an error`, e)
-            })
-        } else {
-          return {
-            data: {},
-            component,
-            params,
-            options
-          }
-        }
-      })
+    for (let fn of middleware) fn(context)
+
+    if (to) return go(to, {
+      from: location,
+      to
+    })
+
+    return {
+      payload,
+      context,
+      redirect
+    }
   }
 
   return {
-    resolve
+    resolve (location, cb) {
+      cb(go(location))
+    }
   }
 }

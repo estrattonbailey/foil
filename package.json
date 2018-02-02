@@ -10,6 +10,7 @@
     "dist"
   ],
   "scripts": {
+    "size": "microbundle build",
     "build": "microbundle build --compress false",
     "watch": "microbundle watch --compress false",
     "publish": "npm publish"
