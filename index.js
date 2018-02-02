@@ -50,11 +50,14 @@ export function router (...defs) {
   const routes = []; // need semi
 
   (function walk (rs, parent, middleware) {
-    while (rs.length) {
-      const def = rs.shift()
-
+    for (let def of rs) {
       if (def.name === 'middleware') {
         middleware.push(def)
+
+        // attach to parent and overwrite existing
+        if (parent.routes && parent.routes.indexOf(def) > -1) {
+          parent.middleware = parent.middleware.concat(def)
+        }
         continue
       }
 
@@ -62,6 +65,7 @@ export function router (...defs) {
       route.middleware = middleware
       route.path = joinRoute(parent.path, route.path)
       route.parts = getParts(route.path)
+
       if (parent.load) {
         const load = route.load
         route.load = (props, ctx) => {
@@ -75,35 +79,47 @@ export function router (...defs) {
     }
   })(defs, { path: '' }, [])
 
-  return {
-    resolve (location, context) {
-      return Promise.resolve(getRoute(location, routes))
-        .then(({ component, load, params, middleware, path, options }) => {
-          const ctx = Object.assign(context || {}, { params, location })
-
-          for (let fn of middleware) fn(ctx)
-
-          if (typeof load === 'function') {
-            return Promise.resolve(load({}, ctx))
-              .then(data => {
-                return {
-                  data: data || {},
-                  component,
-                  params,
-                  options
-                }
-              }).catch(e => {
-                console.error(`foil: route loader threw an error`, e)
-              })
-          } else {
-            return {
-              data: {},
-              component,
-              params,
-              options
-            }
+  function resolve (location, context) {
+    return Promise.resolve(getRoute(location, routes))
+      .then(({ component, load, params, middleware, path, options }) => {
+        const name = component.displayName || component.name
+        let redirect = false
+        const ctx = Object.assign(context || {}, {
+          params,
+          location,
+          redirect (location) {
+            redirect = location
           }
         })
-    }
+
+        for (let fn of middleware) fn(ctx)
+
+        if (redirect) return resolve(redirect, ctx)
+
+        if (typeof load === 'function') {
+          return Promise.resolve(load({}, ctx))
+            .then(data => {
+              return {
+                data: data || {},
+                component,
+                params,
+                options
+              }
+            }).catch(e => {
+              console.error(`foil: route loader for ${name} threw an error`, e)
+            })
+        } else {
+          return {
+            data: {},
+            component,
+            params,
+            options
+          }
+        }
+      })
+  }
+
+  return {
+    resolve
   }
 }

@@ -246,6 +246,7 @@ app.listen(8080)
 1. `document.title` using `options.title` utility
 2. Incremental rendering using `picostate`
 3. Redirect example
+4. Protected routes
 
 * * *
 Many thanks to [jkuri](https://github.com/jkuri) for the name!
