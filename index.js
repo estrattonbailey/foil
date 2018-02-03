@@ -28,10 +28,6 @@ function getRoute (path, routes) {
   }
 }
 
-function joinRoute (a, b) {
-  return [a, b].join('/').replace('//', '/')
-}
-
 export function route (r) {
   return function child (...rs) {
     r.routes = rs || []
@@ -63,15 +59,8 @@ export function router (...defs) {
 
       const route = typeof def === 'function' ? def() : def
       route.middleware = middleware
-      route.path = joinRoute(parent.path, route.path)
+      route.path = [parent.path, route.path].join('/').replace('//', '/')
       route.parts = getParts(route.path)
-
-      if (parent.load) {
-        const load = route.load
-        route.load = (ctx, props) => {
-          return Promise.resolve(parent.load(ctx, props)).then(props => load ? load(ctx, props) : props)
-        }
-      }
 
       routes.push(route)
 
