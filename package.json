@@ -10,9 +10,8 @@
     "dist"
   ],
   "scripts": {
-    "size": "microbundle build",
-    "build": "microbundle build --compress false",
-    "watch": "microbundle watch --compress false",
+    "build": "microbundle build",
+    "watch": "microbundle watch",
     "publish": "npm publish"
   },
   "repository": {

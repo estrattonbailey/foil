@@ -37,9 +37,11 @@ export function route (r) {
 }
 
 export function use (fn) {
-  return function middleware (props, ctx) {
+  function middleware (props, ctx) {
     return fn(props, ctx)
   }
+  middleware._m = '_m'
+  return middleware
 }
 
 export function router (...defs) {
@@ -47,7 +49,7 @@ export function router (...defs) {
 
   (function walk (rs, parent, middleware) {
     for (let def of rs) {
-      if (def.name === 'middleware') {
+      if (def._m === '_m') {
         middleware.push(def)
 
         // attach to parent and overwrite existing
