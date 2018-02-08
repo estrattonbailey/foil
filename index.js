@@ -45,6 +45,7 @@ export function use (fn) {
 }
 
 export function router (...defs) {
+  let loc = null // cache location
   const routes = []; // need semi
 
   (function walk (rs, parent, middleware) {
@@ -104,6 +105,8 @@ export function router (...defs) {
 
   return {
     resolve (location, cb) {
+      if (loc === location) return
+      loc = location
       cb(go(location))
     }
   }
