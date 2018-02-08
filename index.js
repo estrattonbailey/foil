@@ -40,7 +40,7 @@ export function use (fn) {
   function middleware (props, ctx) {
     return fn(props, ctx)
   }
-  middleware._m = '_m'
+  middleware.__middleware = true
   return middleware
 }
 
@@ -49,7 +49,7 @@ export function router (...defs) {
 
   (function walk (rs, parent, middleware) {
     for (let def of rs) {
-      if (def._m === '_m') {
+      if (def.__middleware) {
         middleware.push(def)
 
         // attach to parent and overwrite existing
@@ -77,18 +77,23 @@ export function router (...defs) {
 
     const context = {
       params,
-      location,
-      redirect (loc) {
-        to = loc
-      }
+      location
     }
 
-    for (let fn of middleware) fn(context)
+    for (let fn of middleware) {
+      fn(Object.assign(context, {
+        redirect (loc) {
+          to = loc
+        }
+      }))
+    }
 
-    if (to) return go(to, {
-      from: location,
-      to
-    })
+    if (to) {
+      return go(to, {
+        from: location,
+        to
+      })
+    }
 
     return {
       payload,
