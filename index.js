@@ -9,13 +9,14 @@ function getRoute (path, routes) {
   outer: for (let route of routes) {
     if (urls.length === route.parts.length) {
       inner: for (let i = 0; i < route.parts.length; i++) {
+        const cleanPart = urls[i].split('?')[0]
         if (route.parts[i][0] === ':') {
-          params[route.parts[i].slice(1)] = urls[i]
+          params[route.parts[i].slice(1)] = cleanPart
           continue inner
-        } else if (route.parts[i] === urls[i]) {
+        } else if (route.parts[i] === cleanPart) {
           continue inner
         } else if (route.parts[i] === '*') {
-          break
+          break;
         }
         continue outer
       }
@@ -31,7 +32,6 @@ function getRoute (path, routes) {
 export function route (r) {
   return function child (...rs) {
     r.routes = rs || []
-    r.options = r.options || {}
     return r
   }
 }
@@ -69,6 +69,8 @@ export function router (...defs) {
       walk(route.routes, route, middleware.slice(0, middleware.length)) // clone array
     }
   })(defs, { path: '' }, [])
+
+  console.log(routes)
 
   function go (location, redirect = {}) {
     const { path, params, middleware, payload } = getRoute(location, routes)
