@@ -70,8 +70,6 @@ export function router (...defs) {
     }
   })(defs, { path: '' }, [])
 
-  console.log(routes)
-
   function go (location, redirect = {}) {
     const { path, params, middleware, payload } = getRoute(location, routes)
 
