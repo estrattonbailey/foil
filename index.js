@@ -20,11 +20,15 @@ function getRoute (path, routes) {
         }
         continue outer
       }
-      route.params = params
-      return route
+      return {
+        route,
+        params
+      }
     } else if (route.parts[0] == '*') {
-      route.params = params
-      return route
+      return {
+        route,
+        params
+      }
     }
   }
 }
@@ -71,7 +75,8 @@ export function router (...defs) {
   })(defs, { path: '' }, [])
 
   function go (location, redirect = {}) {
-    const { path, params, middleware, payload } = getRoute(location, routes)
+    const { route, params } = getRoute(location, routes)
+    const { path, middleware, payload } = route
 
     let to = null
 
