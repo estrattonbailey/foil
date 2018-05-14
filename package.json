@@ -1,6 +1,6 @@
 {
   "name": "foil",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "700 byte framework agnostic router.",
   "source": "index.js",
   "module": "dist/foil.es.js",
