@@ -1,6 +1,6 @@
 {
   "name": "foil",
-  "version": "1.0.5",
+  "version": "1.0.5-test",
   "description": "700 byte framework agnostic router.",
   "source": "index.js",
   "module": "dist/foil.es.js",
@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "microbundle build",
-    "watch": "microbundle watch",
+    "watch": "microbundle watch --compress=false",
     "publish": "npm publish"
   },
   "repository": {

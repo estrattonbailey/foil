@@ -75,7 +75,22 @@ export function router (...defs) {
   })(defs, { path: '' }, [])
 
   function go (location, redirect = {}) {
-    const { route, params } = getRoute(location, routes)
+    const match = getRoute(location, routes)
+
+    if (!match) {
+      console.error(
+        'foil: no match for',
+        location
+      )
+
+      return {
+        payload: null,
+        context: {},
+        redirect
+      }
+    }
+
+    const { route, params } = match
     const { path, middleware, payload } = route
 
     let to = null
