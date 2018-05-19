@@ -1,5 +1,3 @@
-const routes = []
-
 function getParts (url) {
   const parts = url.split('/')
   return parts.slice(parts[0] !== '' ? 0 : 1)
@@ -51,7 +49,9 @@ export function use (fn) {
 }
 
 export function router (...defs) {
-  !routes.length && (function walk (rs, parent, middleware) {
+  const routes = []; // need semi
+
+  (function walk (rs, parent, middleware) {
     for (let def of rs) {
       if (def.__middleware) {
         middleware.push(def)
