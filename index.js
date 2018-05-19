@@ -65,7 +65,7 @@ export function router (...defs) {
 
       const route = typeof def === 'function' ? def() : def
       route.middleware = middleware
-      route.path = [parent.path, route.path].join('/').replace('//', '/')
+      route.path = [parent.path, route.path.replace(parent.path, '')].join('/').replace('//', '/')
       route.parts = getParts(route.path)
 
       routes.push(route)
@@ -91,7 +91,7 @@ export function router (...defs) {
     }
 
     const { route, params } = match
-    const { path, middleware, payload } = route
+    const { middleware, payload } = route
 
     let to = null
 
