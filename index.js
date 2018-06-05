@@ -48,7 +48,7 @@ export function use (fn) {
   return middleware
 }
 
-export function router (...defs) {
+export function router (defs = [], userContext = {}) {
   const routes = []; // need semi
 
   (function walk (rs, parent, middleware) {
@@ -77,6 +77,13 @@ export function router (...defs) {
   function go (location, redirect = {}) {
     const match = getRoute(location, routes)
 
+    let context = Object.assign({}, userContext, {
+      state: {
+        params: {},
+        location
+      }
+    })
+
     if (!match) {
       console.error(
         'foil: no match for',
@@ -85,7 +92,7 @@ export function router (...defs) {
 
       return {
         payload: null,
-        context: {},
+        context,
         redirect
       }
     }
@@ -93,19 +100,19 @@ export function router (...defs) {
     const { route, params } = match
     const { middleware, payload } = route
 
+    context = Object.assign(context, {
+      state: {
+        params,
+        location
+      }
+    })
+
     let to = null
 
-    const context = {
-      params,
-      location
-    }
-
     for (let fn of middleware) {
-      fn(Object.assign(context, {
-        redirect (loc) {
-          to = loc
-        }
-      }))
+      fn(context, function redirect (loc) {
+        to = loc
+      })
     }
 
     if (to) {

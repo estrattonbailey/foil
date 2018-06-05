@@ -16,7 +16,7 @@ npm i foil --save
 ```javascript
 import { router, route } from 'foil'
 
-const app = router(
+const app = router([
   route({
     path: '/',
     payload: {
@@ -29,7 +29,7 @@ const app = router(
       // 404
     }
   })
-)
+])
 
 app.resolve('/', ({ payload, context, redirect }) => {
   // rendering logic
@@ -57,34 +57,60 @@ export default route({
 ```
 
 ### Parameters
-Routes can be defined with simple parameters. When matched, these params will be returned on the `context` object. Only named parameters (`:slug`) and wildcards (`*`) are supported at this time.
+Routes can be defined with simple parameters. When matched, these params will be
+returned on the `context` object. Only named parameters (`:slug`) and wildcards
+(`*`) are supported at this time.
 ```javascript
 import { router, route } from 'foil'
 
-const app = router(
+const app = router([
   route({
     path: '/:slug',
     payload: {
       // ...
     }
   })
-)
+])
 
 app.resolve('/hello', ({ payload, context }) => {
-  console.log(context.params) // => { slug: 'hello' }
+  console.log(context.state.params) // => { slug: 'hello' }
 })
 ```
 
 ### Context
-Context is created when a route is matched. It contains the following properties and methods:
-- `params` - an `object` containing any matched route parameters, defaults to an empty `{}`
-- `location` - a `string` representing the full path that was matched
-- `redirect` - a `function` that accepts a redirect location
+`context` is created when a route is matched. It looks like this:
+
+```javascript
+{
+  state: {
+    params: {},
+    location: ''
+  }
+}
+```
+
+#### Custom Context
+You can add your own properties to `context` when you create a router instance.
+It will then be available to every resolved route.
+
+```javascript
+const app = router(routes, {
+  foo: true
+})
+
+app.resolve('/', ({ payload, context, redirect }) => {
+  console.log(context) // => { state: { ... }, foo: true }
+})
+```
 
 ### Nested routes
-Routes can be nested by passing a route to the function returned from the parent route. Nested routes build on the paths of their parents.
+Routes can be nested by passing a route to the function returned from the parent
+route. Nested routes build on the paths of their parents.
 
-This means that certain generic routes can be reused in different locations. The code below results in four separate routes: `/about`, `/about/:slug`, `/posts`, and `/posts/:slug`.
+This means that certain generic routes can be reused in different locations. The
+code below results in four separate routes: `/about`, `/about/:slug`, `/posts`,
+and `/posts/:slug`.
+
 ```javascript
 import { router, route } from 'foil'
 
@@ -103,46 +129,55 @@ const Lightbox = route({
   payload: {}
 })
 
-export default router(
+export default router([
   About(
     Lightbox
   ),
   Posts(
     Lightbox
   )
-)
+])
 ```
 
 ## Middleware
-`foil` implements very simple "middleware". Middleware functions are defined with the `use` export from `foil`. They are executed on each route transition for the route scope in which they are defined, and all nested scopes. Middleware are passed the complete context of the route matched.
+`foil` implements very simple "middleware". Middleware functions are defined
+with the `use` export from `foil`.
 
-Below, the `root` middleware will be called when the `Home` route is matched. When either `Posts` or `Post` are matched, *both* `root` and `nested` will fire.
+Middleware are passed the complete `context` of the route matched, *plus* a
+handy `redirect` method.
+
+They are executed on each route transition for the route scope in which they are
+defined, and all nested scopes.
+
+Below, the `root` middleware will be called when the `Home` or `Posts` routes
+are matched.  When either `Home`, `Posts` or `Post` are matched, *both* `root` and
+`nested` will fire.
+
 ```javascript
 const root = use(context => // ...)
 const nested = use(context => // ...)
 
-export default router(
+export default router([
   root,
   Home,
   Posts(
     nested,
     Post
   )
-)
+])
 ```
 
 ## Redirects
-Redirects in `foil` happen via the `context` object and its `redirect` method. The easiest approach is to define a middleware that handles some or all redirects for your application.
+Redirects are creating using middleware.
+
 ```javascript
 import { router, route, use } from 'foil'
 
-const redirectMiddleware = use(context => {
-  const { location } = context
+const redirectMiddleware = use((context, redirect) => {
+  const { location } = context.state
 
   if (location === '/some-path') {
-    return context.redirect('/some-other-path')
-  } else if (...) {
-    // etc
+    return redirect('/some-other-path')
   }
 })
 
@@ -152,7 +187,10 @@ const app = router(
 )
 ```
 
-If a redirect is issued via `context.redirect()`, the `redirect` prop passed to your `app.resolve()` callback will contain `to` and `from` properties that tell you where the redirect occurred:
+If a redirect is issued via `redirect()`, the `redirect` prop passed to
+your `app.resolve()` callback will contain `to` and `from` properties that tell
+you where the redirect occurred:
+
 ```javascript
 app.resolve('/some-path', ({ payload, context, redirect }) => {
   console.log(redirect) // { to: '/some-other-path', from: '/some-path' }
@@ -160,7 +198,9 @@ app.resolve('/some-path', ({ payload, context, redirect }) => {
 ```
 
 ### Protected Routes
-A route or a group of routes can also easily be protected using this same pattern.
+A route or a group of routes can also easily be protected using this same
+pattern.
+
 ```javascript
 import { router, route, use } from 'foil'
 import store from './store.js' // whatever you want to use
@@ -178,9 +218,9 @@ const app = router(
     path: '/account',
     payload: {}
   })(
-    use(context => {
+    use((context, redirect) => {
       if (!store.state.user) {
-        return context.redirect('/login')
+        return redirect('/login')
       }
     }),
     route({
@@ -192,11 +232,20 @@ const app = router(
 ```
 
 ## Server Side Rendering
+Create a new `foil` instance on each request.
+
 ```javascript
-const server = require('express')()
-const app = require('./app.js')
+import express from 'express'
+import { router } from 'foil'
+import routes from './routes.js'
+
+const server = express()
 
 server.get('*', (req, res) => {
+  const app = router(routes, {
+    serverToken: ''
+  })
+
   app.resolve(req.originalUrl, ({ payload, context, redirect }) => {
     if (redirect.to) {
       res.redirect(redirect.to)
@@ -213,9 +262,13 @@ server.listen(8080)
 - React - [@foil/react](https://github.com/estrattonbailey/foil-react)
 
 # About the Name
-I like the word *foil* as a figurative term, as in *to set off by contrast*. In the context of routing in React (which is my main motivation behind this library, see [@foil/react](https://github.com/estrattonbailey/foil-react)), `foil` is a bit of a departure from many of the more well established patterns.
+I like the word *foil* as a figurative term, as in *to set off by contrast*. In
+the context of routing in React (which is my main motivation behind this
+library, see [@foil/react](https://github.com/estrattonbailey/foil-react)),
+`foil` is a bit of a departure from many of the more well established patterns.
 
-Many thanks to [jkuri](https://github.com/jkuri) for letting me use the npm package name! Very kind of him :)
+Many thanks to [jkuri](https://github.com/jkuri) for letting me use the npm
+package name! Very kind of him :)
 
 ## License
 MIT License © [Eric Bailey](https://estrattonbailey.com)
