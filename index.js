@@ -81,7 +81,7 @@ export function router (defs = [], userContext = {}) {
       state: {
         params: {},
         pathname,
-        search: search || '',
+        search: search ? ('?' + search) : '',
         location
       }
     })
