@@ -84,6 +84,8 @@ app.resolve('/hello', ({ payload, context }) => {
 {
   state: {
     params: {},
+    pathname: '',
+    search: '',
     location: ''
   }
 }
@@ -174,9 +176,9 @@ Redirects are creating using middleware.
 import { router, route, use } from 'foil'
 
 const redirectMiddleware = use((context, redirect) => {
-  const { location } = context.state
+  const { pathname } = context.state
 
-  if (location === '/some-path') {
+  if (pathname === '/some-path') {
     return redirect('/some-other-path')
   }
 })

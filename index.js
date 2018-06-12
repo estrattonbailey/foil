@@ -9,11 +9,10 @@ function getRoute (path, routes) {
   outer: for (let route of routes) {
     if (urls.length === route.parts.length) {
       inner: for (let i = 0; i < route.parts.length; i++) {
-        const cleanPart = urls[i].split('?')[0]
         if (route.parts[i][0] === ':') {
-          params[route.parts[i].slice(1)] = cleanPart
+          params[route.parts[i].slice(1)] = urls[i]
           continue inner
-        } else if (route.parts[i] === cleanPart) {
+        } else if (route.parts[i] === urls[i]) {
           continue inner
         } else if (route.parts[i] === '*') {
           break;
@@ -75,11 +74,14 @@ export function router (defs = [], userContext = {}) {
   })(defs, { path: '' }, [])
 
   function go (location, redirect = {}) {
-    const match = getRoute(location, routes)
+    const [ pathname, search ] = location.split('?')
+    const match = getRoute(pathname, routes)
 
     let context = Object.assign({}, userContext, {
       state: {
         params: {},
+        pathname,
+        search: search || '',
         location
       }
     })
@@ -100,12 +102,7 @@ export function router (defs = [], userContext = {}) {
     const { route, params } = match
     const { middleware, payload } = route
 
-    context = Object.assign(context, {
-      state: {
-        params,
-        location
-      }
-    })
+    context.state.params = params
 
     let to = null
 
