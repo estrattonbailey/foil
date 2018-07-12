@@ -6,7 +6,9 @@ function getParts (url) {
 function getRoute (path, routes) {
   const urls = getParts(path)
   const params = {}
-  outer: for (let route of routes) {
+  outer: for (let i = 0; i < routes.length; i++) {
+    const route = routes[i]
+
     if (urls.length === route.parts.length) {
       inner: for (let i = 0; i < route.parts.length; i++) {
         if (route.parts[i][0] === ':') {
@@ -51,7 +53,9 @@ export function router (defs = [], userContext = {}) {
   const routes = []; // need semi
 
   (function walk (rs, parent, middleware) {
-    for (let def of rs) {
+    for (let i = 0; i < rs.length; i++) {
+      const def = rs[i]
+
       if (def.__middleware) {
         middleware.push(def)
 
@@ -74,14 +78,26 @@ export function router (defs = [], userContext = {}) {
   })(defs, { path: '' }, [])
 
   function go (location, redirect = {}) {
-    const [ pathname, search ] = location.split('?')
+    let hash
+    let search
+    let [ pathname, ...parts ] = location.split(/#|\?/)
+
+    pathname = pathname.replace(/\/$/g, '')
+
+    for (let i = 0; i < parts.length; i++) {
+      const [ rest ] = location.split(parts[i])
+      if (rest[rest.length - 1] === '?') search = parts[i]
+      if (rest[rest.length - 1] === '#') hash = parts[i]
+    }
+
     const match = getRoute(pathname, routes)
 
     let context = Object.assign({}, userContext, {
       state: {
         params: {},
         pathname,
-        search: search ? ('?' + search) : '',
+        search,
+        hash,
         location
       }
     })
@@ -106,8 +122,8 @@ export function router (defs = [], userContext = {}) {
 
     let to = null
 
-    for (let fn of middleware) {
-      fn(context, function redirect (loc) {
+    for (let i = 0; i < middleware.length; i++) {
+      middleware[i](context, function redirect (loc) {
         to = loc
       })
     }
