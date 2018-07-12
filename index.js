@@ -86,8 +86,8 @@ export function router (defs = [], userContext = {}) {
 
     for (let i = 0; i < parts.length; i++) {
       const [ rest ] = location.split(parts[i])
-      if (rest[rest.length - 1] === '?') search = parts[i]
-      if (rest[rest.length - 1] === '#') hash = parts[i]
+      if (rest[rest.length - 1] === '?') search = '?' + parts[i]
+      if (rest[rest.length - 1] === '#') hash = '#' + parts[i]
     }
 
     const match = getRoute(pathname, routes)
