@@ -1,5 +1,5 @@
 function getParts (url) {
-  const parts = url.split('/')
+  const parts = url.split('/').filter(Boolean)
   return parts.slice(parts[0] !== '' ? 0 : 1)
 }
 
@@ -81,8 +81,6 @@ export function router (defs = [], userContext = {}) {
     let hash
     let search
     let [ pathname, ...parts ] = location.split(/#|\?/)
-
-    pathname = pathname.replace(/\/$/g, '')
 
     for (let i = 0; i < parts.length; i++) {
       const [ rest ] = location.split(parts[i])
